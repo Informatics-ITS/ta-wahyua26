@@ -85,7 +85,7 @@
               <form class="form-card" action="/minta-rekomendasi" method="post">
                 @csrf
                 <div class="form-group col flex-column d-flex">
-                  <label class="form-control-label px-3">{{ GoogleTranslate::trans('Ruang Kerja', app()->getLocale()) }} : {{ $ruang->nama }}</label>
+                  <label class="form-control-label px-3">{{ GoogleTranslate::trans('Ruang Kerja', app()->getLocale()) }} : {{ $namaRuang }}</label>
                   <label class="form-control-label px-3">{{ GoogleTranslate::trans('Lokasi', app()->getLocale()) }} : {{ $ruang->lokasi }}</label>
                   <label class="form-control-label px-3">{{ GoogleTranslate::trans('Bulan', app()->getLocale()) }} : {{ $namaBulan }}</label>
                   <input type="hidden" id="bulan" name="bulan" value="{{ $bulan }}">
@@ -114,7 +114,7 @@
     
         <!-- Right -->
         <div>
-          <a href="#!" class="text-white me-4">Sistem Informasi AudioTest Pro</a>
+          <a href="#!" class="text-white me-4">AudioVis Pro</a>
         </div>
         <!-- Right -->
       </div>

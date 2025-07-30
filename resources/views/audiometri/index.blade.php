@@ -222,11 +222,28 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Main content -->
     <div class="content">
       <div class="row">
+        <div class="col"></div>
+        <div class="col"></div>
+        <div class="col"></div>
+        <div class="col">
+          <form method="GET" action="{{ route('audiometri') }}">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" name="query" placeholder="{{ GoogleTranslate::trans('Mencari hasil audiometri...', app()->getLocale()) }}"  value="{{ request('query') }}">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+        </div>
+      </div>
+      <div class="row">
         <div class="col">
           <table class="table table-striped projects text-center">
             <tr>
-                <th>@lang('audiometri.nama')</th>
-                <th>@lang('audiometri.tanggal')</th>
+                <th><a href="{{ route('audiometri', ['sort' => 'users.name', 'direction' => $direction === 'asc' ? 'desc' : 'asc']) }}">
+                      @lang('audiometri.nama') {{ $sort === 'users.name' ? ($direction === 'asc' ? '▲' : '▼') : '' }}
+                    </a></th>
+                <th><a href="{{ route('audiometri', ['sort' => 'audiometris.tanggal', 'direction' => $direction === 'asc' ? 'desc' : 'asc']) }}">
+                      @lang('audiometri.tanggal') {{ $sort === 'audiometris.tanggal' ? ($direction === 'asc' ? '▲' : '▼') : '' }}
+                    </a></th>
                 <th>@lang('audiometri.waktu')</th>
                 <th>@lang('audiometri.hasil')</th>
                 <th>@lang('audiometri.aksi')</th>
@@ -245,6 +262,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </tr> 
             @endforeach 
         </table>
+        {{ $hasil->appends(['sort' => $sort, 'direction' => $direction])->links() }}
         </div>
       </div>
     </div>

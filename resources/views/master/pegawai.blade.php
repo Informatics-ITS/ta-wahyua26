@@ -92,7 +92,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="col"></div>
           <div class="col"></div>
           <div class="col"></div>
-          <div class="col"></div>
+          <div class="col">
+            <form method="GET" action="{{ route('pegawai') }}">
+              <div class="input-group mb-3">
+                  <input type="text" class="form-control" name="query" placeholder="{{ GoogleTranslate::trans('Searching for employee...', app()->getLocale()) }}"  value="{{ request('query') }}">
+                  <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+              </div>
+          </form>
+          </div>
           <div class="col">
             <div class="card">
               <a href="{{ route('tambah-pegawai') }}" class="btn btn-primary"><i class="fas fa-user-plus"></i> @lang('pegawai.tambah')</a>
@@ -102,12 +109,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="row">
           <table class="table table-striped projects text-center">
             <tr>
-                <th>@lang('pegawai.nama')</th>
+              <th><a href="{{ route('pegawai', ['sort' => 'users.name', 'direction' => $direction === 'asc' ? 'desc' : 'asc']) }}">
+                @lang('pegawai.nama') {{ $sort === 'users.name' ? ($direction === 'asc' ? '▲' : '▼') : '' }}
+              </a></th>
                 <th>@lang('pegawai.email')</th>
-                <th>@lang('pegawai.tanggal')</th>
-                <th>@lang('pegawai.jabatan')</th>
-                <th>@lang('pegawai.ruang')</th>
-                <th>@lang('pegawai.status')</th>
+                <th><a href="{{ route('pegawai', ['sort' => 'users.tglLahir', 'direction' => $direction === 'asc' ? 'desc' : 'asc']) }}">
+                  @lang('pegawai.tanggal') {{ $sort === 'users.tglLahir' ? ($direction === 'asc' ? '▲' : '▼') : '' }}
+                </a></th>
+                <th><a href="{{ route('pegawai', ['sort' => 'jabatans.jabatan', 'direction' => $direction === 'asc' ? 'desc' : 'asc']) }}">
+                  @lang('pegawai.jabatan') {{ $sort === 'jabatans.jabatan' ? ($direction === 'asc' ? '▲' : '▼') : '' }}
+                </a></th>
+                <th><a href="{{ route('pegawai', ['sort' => 'workspaces.nama', 'direction' => $direction === 'asc' ? 'desc' : 'asc']) }}">
+                  @lang('pegawai.ruang') {{ $sort === 'workspaces.nama' ? ($direction === 'asc' ? '▲' : '▼') : '' }}
+                </a></th>
+                <th><a href="{{ route('pegawai', ['sort' => 'users.status', 'direction' => $direction === 'asc' ? 'desc' : 'asc']) }}">
+                  @lang('pegawai.status') {{ $sort === 'users.status' ? ($direction === 'asc' ? '▲' : '▼') : '' }}
+                </a></th>
                 <th>@lang('pegawai.aksi')</th>
             </tr> 
             @foreach ($pegawai as $item)
@@ -133,6 +150,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </tr> 
             @endforeach 
         </table>
+        {{ $pegawai->appends(['sort' => $sort, 'direction' => $direction])->links() }}
         </div>
       </div>
     </div>

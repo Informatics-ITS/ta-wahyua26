@@ -6,11 +6,15 @@ use App\Models\Jabatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use Stichoza\GoogleTranslate\GoogleTranslate as GoogleTranslateGoogleTranslate;
 
 class UserController extends Controller
 {
     public function tambahPegawai(){
         $jabatan = Jabatan::get();
+        foreach ($jabatan as $item) {
+            $item->jabatan = GoogleTranslateGoogleTranslate::trans($item->jabatan,app()->getLocale());
+        }
         return view('user.tambahpegawai',['jabatan' => $jabatan]);
     }
 
@@ -51,18 +55,27 @@ class UserController extends Controller
         }
         
         //dd($user);
+        $msg = 'Pegawai berhasil ditambah!';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
 
-        return redirect()->route('pegawai')->with('success', 'Pegawai berhasil ditambah!');
+        return redirect()->route('pegawai')->with('success', $transMsg);
     }
 
     public function editPegawai($id){
         $jabatan = Jabatan::get();
         $user = User::where('id', '=', $id)->first();
+        foreach ($jabatan as $item) {
+            $item->jabatan = GoogleTranslateGoogleTranslate::trans($item->jabatan,app()->getLocale());
+        }
         return view('user.editpegawai', ['user' => $user, 'jabatan' => $jabatan]);
     }
 
     public function editAkun($id){
         $jabatan = Jabatan::get();
+        //dd($jabatan);
+        foreach ($jabatan as $item) {
+            $item->jabatan = GoogleTranslateGoogleTranslate::trans($item->jabatan,app()->getLocale());
+        }
         $user = User::where('id', '=', $id)->first();
         return view('user.editakun', ['user' => $user, 'jabatan' => $jabatan]);
     }
@@ -105,7 +118,9 @@ class UserController extends Controller
             $user->update($data);
         }
         //dd($user);
-        return redirect()->route('pegawai')->with('success', 'Karyawan berhasil diubah!');
+        $msg = 'Karyawan berhasil diubah';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('pegawai')->with('success', $transMsg);
     }
 
     public function updateAkun(Request $request){
@@ -145,7 +160,9 @@ class UserController extends Controller
             $user->update($data);
         }
 
-        return redirect()->route('detail-akun', ['id' => $request->id ])->with('success', 'Detail akun berhasil diubah!');
+        $msg = 'Detail akun berhasil diubah';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('detail-akun', ['id' => $request->id ])->with('success', $transMsg);
     }
 
     public function hapusPegawai($id)
@@ -155,11 +172,16 @@ class UserController extends Controller
             ['id','=',$id],
         ])->delete();
 
-        return redirect()->route('pegawai')->with('success', 'Karyawan berhasil dihapus!');
+        $msg = 'Karyawan berhasil dihapus!';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('pegawai')->with('success', $transMsg);
     }
 
     public function detail($id){
         $user = DB::table('users')->join('jabatans', 'jabatans.id', '=', 'users.jabatan_id')->join('workspaces', 'workspaces.id', '=', 'jabatans.workspace_id')->select('users.*', 'jabatans.jabatan', 'workspaces.nama')->where('users.id', '=', $id)->first();
+        //dd($user);
+        $user->nama = GoogleTranslateGoogleTranslate::trans($user->nama,app()->getLocale());
+        $user->jabatan = GoogleTranslateGoogleTranslate::trans($user->jabatan,app()->getLocale());
         return view('user.detail',['user' => $user]);
     }
 
@@ -174,7 +196,10 @@ class UserController extends Controller
         $data = ['foto' => $filename];
         $user->update($data);
 
-        return redirect()->route('detail-akun', ['id' => $request->id ])->with('success', 'Foto profil berhasil diubah!');
+        $msg = 'Foto profil berhasil diubah';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+
+        return redirect()->route('detail-akun', ['id' => $request->id ])->with('success', $transMsg);
     }
 }
 

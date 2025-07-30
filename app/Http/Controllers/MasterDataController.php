@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
+use Stichoza\GoogleTranslate\GoogleTranslate as GoogleTranslateGoogleTranslate;
 
 class MasterDataController extends Controller
 {
@@ -19,25 +20,65 @@ class MasterDataController extends Controller
         return view('master.menu', ['user' => $user->count(), 'jabatan' => $jabatan->count(), 'ruangan' => $ruangan->count()]);
     }
 
-    public function pegawai(){
-        $pegawai = DB::table('users')->join('jabatans', 'users.jabatan_id', '=', 'jabatans.id')->join('workspaces', 'jabatans.workspace_id', '=', 'workspaces.id')->select('users.*', 'workspaces.nama', 'jabatans.jabatan')->get();
+    public function pegawai(Request $request){
+        $sort = $request->get('sort', 'users.name'); // Default sort by 'name'
+        $direction = $request->get('direction', 'asc'); // Default direction 'asc'
+
+        $query = $request->input('query'); // Menerima query pencarian dari input
+
+        // Jika ada query pencarian, lakukan pencarian pada title dan content
+        if ($query) {
+            $pegawai = DB::table('users')->join('jabatans', 'users.jabatan_id', '=', 'jabatans.id')
+            ->join('workspaces', 'jabatans.workspace_id', '=', 'workspaces.id')
+            ->select('users.*', 'workspaces.nama', 'jabatans.jabatan')
+            ->where('users.name', 'like', "%{$query}%")
+            ->orWhere('users.email', 'like', "%{$query}%")
+            ->orWhere('users.tglLahir', 'like', "%{$query}%")
+            ->orWhere('users.status', 'like', "%{$query}%")
+            ->orWhere('workspaces.nama', 'like', "%{$query}%")
+            ->orWhere('jabatans.jabatan', 'like', "%{$query}%")
+            ->orderBy($sort, $direction)->paginate(20);
+        } else {
+            $pegawai = DB::table('users')->join('jabatans', 'users.jabatan_id', '=', 'jabatans.id')
+            ->join('workspaces', 'jabatans.workspace_id', '=', 'workspaces.id')
+            ->select('users.*', 'workspaces.nama', 'jabatans.jabatan')
+            ->orderBy($sort, $direction)->paginate(20);
+        }
+        
         //dd($pegawai);
-        return view('master.pegawai', ['pegawai' => $pegawai]);
+        
+        foreach ($pegawai as $item) {
+            $item->nama = GoogleTranslateGoogleTranslate::trans($item->nama,app()->getLocale());
+            $item->jabatan = GoogleTranslateGoogleTranslate::trans($item->jabatan,app()->getLocale());
+            $item->status = GoogleTranslateGoogleTranslate::trans($item->status,app()->getLocale());
+        }
+        return view('master.pegawai', compact('pegawai', 'sort', 'direction'));
     }
 
     public function ruang(){
         $ruang = Workspace::get();
+        foreach ($ruang as $item) {
+            $item->nama = GoogleTranslateGoogleTranslate::trans($item->nama,app()->getLocale());
+        }
         return view('master.ruang', ['ruang' => $ruang]);
     }
 
     public function jabatan(){
         $jabatan = DB::table('jabatans')->join('workspaces', 'workspaces.id', '=', 'jabatans.workspace_id')->select('jabatans.*', 'workspaces.nama')->get();
         //dd($jabatan);
+        foreach ($jabatan as $item) {
+            $item->divisi = GoogleTranslateGoogleTranslate::trans($item->divisi,app()->getLocale());
+            $item->jabatan = GoogleTranslateGoogleTranslate::trans($item->jabatan,app()->getLocale());
+            $item->nama = GoogleTranslateGoogleTranslate::trans($item->nama,app()->getLocale());
+        }
         return view('master.jabatan', ['jabatan' => $jabatan]);
     }
 
     public function tambahJabatan(){
         $ruang = Workspace::get();
+        foreach ($ruang as $item) {
+            $item->nama = GoogleTranslateGoogleTranslate::trans($item->nama,app()->getLocale());
+        }
         return view('master.tambahjabatan', ['ruang' => $ruang]);
     }
 
@@ -59,12 +100,19 @@ class MasterDataController extends Controller
             'workspace_id' => $request->ruangKerja,
         ]);
 
-        return redirect()->route('jabatan')->with('success', 'Posisi Pegawai berhasil ditambah!');
+        $msg = 'Posisi pegawai berhasil ditambah!';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('jabatan')->with('success', $transMsg);
     }
 
     public function editJabatan($id){
         $jabatan = Jabatan::where('id', '=', $id)->first();
         $ruang = Workspace::get();
+        //dd($ruang);
+        foreach ($ruang as $item) {
+            $item->nama = GoogleTranslateGoogleTranslate::trans($item->nama,app()->getLocale());
+        }
+        
         return view('master.editjabatan', ['jabatan' => $jabatan, 'ruang' => $ruang]);
     }
 
@@ -88,7 +136,9 @@ class MasterDataController extends Controller
             'bising' => $request->bising,
         ]);
 
-        return redirect()->route('ruang')->with('success', 'Ruang Kerja berhasil ditambah!');
+        $msg = 'Ruang kerja berhasil ditambah!';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('ruang')->with('success', $transMsg);
     }
 
     public function updateJabatan(Request $request){
@@ -112,7 +162,9 @@ class MasterDataController extends Controller
 
         $jabatan->update($data);
         //dd($user);
-        return redirect()->route('jabatan')->with('success', 'Posisi Pegawai berhasil diubah!');
+        $msg = 'Posisi pegawai berhasil diubah!';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('jabatan')->with('success', $transMsg);
     }
 
     public function updateRuang(Request $request){
@@ -136,7 +188,9 @@ class MasterDataController extends Controller
 
         $ruang->update($data);
         //dd($user);
-        return redirect()->route('ruang')->with('success', 'Ruang Kerja berhasil diubah!');
+        $msg = 'Ruang kerja berhasil diubah!';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('ruang')->with('success', $transMsg);
     }
 
     public function hapusJabatan($id)
@@ -146,7 +200,9 @@ class MasterDataController extends Controller
             ['id','=',$id],
         ])->delete();
 
-        return redirect()->route('jabatan')->with('success', 'Posisi Pegawai berhasil dihapus!');
+        $msg = 'Posisi pegawai berhasil dihapus!';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('jabatan')->with('success', $transMsg);
     }
 
     public function hapusRuang($id)
@@ -155,7 +211,9 @@ class MasterDataController extends Controller
             ['id','=',$id],
         ])->delete();
 
-        return redirect()->route('ruang')->with('success', 'Ruang Kerja berhasil dihapus!');
+        $msg = 'Ruang kerja berhasil dihapus!';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('ruang')->with('success', $transMsg);
     }
 
     public function api()

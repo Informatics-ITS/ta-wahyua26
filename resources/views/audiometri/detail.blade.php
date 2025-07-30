@@ -262,9 +262,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     <div class="card">
                                         <div class="h5 font-weight-bold">@lang('detailAudiometri.hasil')</div>
                                         <div class="card-body">
-                                            <p id="imgKiri"></p><br>
+                                            <div id="gauge-kiri" style="width: 500px; height: 150px;"></div><br>
                                             <input type="hidden" id="hasilKiri" name="hasilKiri" placeholder="" value="{{ $detail->hasilKiri }}">
-                                            <div class="text-center h5 font-weight-bold">{{ $detail->hasilKiri }}% ({{ $detail->keteranganKiri }})</div>                                            
+                                            <div class="text-center h5 font-weight-bold">{{ $detail->keteranganKiri }}</div>                                            
                                         </div>
                                     </div>
                                 </div>
@@ -286,9 +286,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     <div class="card">
                                         <div class="h5 font-weight-bold">@lang('detailAudiometri.hasil')</div>
                                         <div class="card-body">
-                                          <p id="imgKanan"></p><br>
+                                          {{-- <p id="imgKanan"></p><br> --}}
+                                          <div id="gauge-kanan" style="width: 500px; height: 150px;"></div><br>
                                           <input type="hidden" id="hasilKanan" name="hasilKanan" placeholder="" value="{{ $detail->hasilKanan }}">
-                                          <div class="text-center h5 font-weight-bold">{{ $detail->hasilKanan }}% ({{ $detail->keteranganKanan }})</div>
+                                          <div class="text-center h5 font-weight-bold">{{ $detail->keteranganKanan }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -299,9 +300,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <div class="card">
                             <div class="font-weight-bold h4">@lang('detailAudiometri.seluruh')</div>
                             <div class="card-body">
-                              <p id="img"></p><br>
+                              {{-- <p id="img"></p><br> --}}
+                              <div id="gauge" style="width: 500px; height: 150px;"></div><br>
                               <input type="hidden" id="hasil" name="hasil" placeholder="" value="{{ $detail->hasil }}">
-                                <div class="text-center h5 font-weight-bold">{{ $detail->hasil }}% ({{ $detail->keterangan }})</div>
+                                <div class="text-center h5 font-weight-bold">{{ $detail->keterangan }}</div>
                             </div>
                         </div>
                     </div>
@@ -383,6 +385,112 @@ scratch. This page gets rid of all links and provides the needed markup only.
       document.getElementById('img').innerHTML = "<img src=\"{{ asset('AdminLTE/dist/img/gangguankomunikasi.png') }}\">";
     }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/raphael@2.3.0/raphael.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/justgage@1.3.5/justgage.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var hasil = parseFloat(document.getElementById("hasil").value) || 0;
+
+    var g = new JustGage({
+      id: "gauge",
+      value: hasil,
+      min: 0,
+      max: 100,
+      label: "%",
+      pointer: true,
+      gaugeWidthScale: 0.6,
+      levelColors: ["#8B0000", "#FF0000", "#90EE90", "#006400"],
+      customSectors: [{
+        color: "#8B0000",
+        lo: 0,
+        hi: 20
+      }, {
+        color: "#FF0000",
+        lo: 20,
+        hi: 40
+      }, {
+        color: "#90EE90",
+        lo: 40,
+        hi: 70
+      }, {
+        color: "#006400",
+        lo: 70,
+        hi: 100
+      }]
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var hasil = parseFloat(document.getElementById("hasilKanan").value) || 0;
+
+    var g = new JustGage({
+      id: "gauge-kanan",
+      value: hasil,
+      min: 0,
+      max: 100,
+      label: "%",
+      pointer: true,
+      gaugeWidthScale: 0.6,
+      levelColors: ["#8B0000", "#FF0000", "#90EE90", "#006400"],
+      customSectors: [{
+        color: "#8B0000",
+        lo: 0,
+        hi: 20
+      }, {
+        color: "#FF0000",
+        lo: 20,
+        hi: 40
+      }, {
+        color: "#90EE90",
+        lo: 40,
+        hi: 70
+      }, {
+        color: "#006400",
+        lo: 70,
+        hi: 100
+      }]
+    });
+  });
+</script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var hasil = parseFloat(document.getElementById("hasilKiri").value) || 0;
+
+    var g = new JustGage({
+      id: "gauge-kiri",
+      value: hasil,
+      min: 0,
+      max: 100,
+      label: "%",
+      pointer: true,
+      gaugeWidthScale: 0.6,
+      levelColors: ["#8B0000", "#FF0000", "#90EE90", "#006400"],
+      customSectors: [{
+        color: "#8B0000",
+        lo: 0,
+        hi: 20
+      }, {
+        color: "#FF0000",
+        lo: 20,
+        hi: 40
+      }, {
+        color: "#90EE90",
+        lo: 40,
+        hi: 70
+      }, {
+        color: "#006400",
+        lo: 70,
+        hi: 100
+      }]
+    });
+  });
+</script>
+
 {{-- 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

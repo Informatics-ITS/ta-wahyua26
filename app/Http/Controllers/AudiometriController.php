@@ -8,30 +8,59 @@ use App\Models\Rekomendasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Stichoza\GoogleTranslate\GoogleTranslate as GoogleTranslateGoogleTranslate;
 
 class AudiometriController extends Controller
 {
-    public function index(){
-        $hasil = DB::table('audiometris')->join('users', 'audiometris.user_id', '=', 'users.id')->select('audiometris.*', 'users.name')->get();
-        return view('audiometri.index', ['hasil' => $hasil]);
+    public function index(Request $request){
+        $sort = $request->get('sort', 'audiometris.tanggal'); // Default sort by 'tanggal'
+        $direction = $request->get('direction', 'asc'); // Default direction 'asc'
+        //dd($hasil);
+        $query = $request->input('query'); // Menerima query pencarian dari input
+
+        // Jika ada query pencarian, lakukan pencarian pada title dan content
+        if ($query) {
+            $hasil = DB::table('audiometris')->join('users', 'audiometris.user_id', '=', 'users.id')
+            ->select('audiometris.*', 'users.name')
+            ->where('users.name', 'like', "%{$query}%")
+            ->orWhere('audiometris.tanggal', 'like', "%{$query}%")
+            ->orWhere('audiometris.waktu', 'like', "%{$query}%")
+            ->orWhere('audiometris.hasil', 'like', "%{$query}%")
+            ->orderBy($sort, $direction)
+            ->paginate(20);
+        } else {
+            $hasil = DB::table('audiometris')->join('users', 'audiometris.user_id', '=', 'users.id')
+            ->select('audiometris.*', 'users.name')
+            ->orderBy($sort, $direction)
+            ->paginate(20);
+        }
+        foreach ($hasil as $item) {
+            $item->keterangan = GoogleTranslateGoogleTranslate::trans($item->keterangan,app()->getLocale());
+        }
+        return view('audiometri.index', compact('hasil', 'sort', 'direction'));
     }
 
     public function detail($id){
         $detail = DB::table('audiometris')->join('users', 'audiometris.user_id', '=', 'users.id')->select('audiometris.*', 'users.name')->where('audiometris.id', $id)->first();
         //dd($detail);
-        $kiri1 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 1)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
-        $kiri2 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 2)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
-        $kiri3 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 3)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
-        $kiri4 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 4)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
-        $kiri5 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 5)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
+        // $kiri1 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 1)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
+        // $kiri2 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 2)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
+        // $kiri3 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 3)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
+        // $kiri4 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 4)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
+        // $kiri5 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 5)->where('detail_audiometris.posisiTelinga', 'kiri')->avg('detail_audiometris.nilai');
 
-        $kanan1 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 1)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
-        $kanan2 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 2)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
-        $kanan3 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 3)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
-        $kanan4 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 4)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
-        $kanan5 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 5)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
+        // $kanan1 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 1)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
+        // $kanan2 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 2)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
+        // $kanan3 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 3)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
+        // $kanan4 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 4)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
+        // $kanan5 = DB::table('detail_audiometris')->join('audiometris', 'detail_audiometris.audiometri_id', '=', 'audiometris.id')->where('audiometris.id', $id)->where('detail_audiometris.deret_id', 5)->where('detail_audiometris.posisiTelinga', 'kanan')->avg('detail_audiometris.nilai');
 
-        return view('audiometri.detail', ['detail' => $detail, 'kiri1' => $kiri1, 'kiri2' => $kiri2, 'kiri3' => $kiri3, 'kiri4' => $kiri4, 'kiri5' => $kiri5, 'kanan1' => $kanan1, 'kanan2' => $kanan2, 'kanan3' => $kanan3, 'kanan4' => $kanan4, 'kanan5' => $kanan5]);
+        //dd($detail);
+        $detail->keterangan = GoogleTranslateGoogleTranslate::trans($detail->keterangan,app()->getLocale());
+        $detail->keteranganKiri = GoogleTranslateGoogleTranslate::trans($detail->keteranganKiri,app()->getLocale());
+        $detail->keteranganKanan = GoogleTranslateGoogleTranslate::trans($detail->keteranganKanan,app()->getLocale());
+
+        return view('audiometri.detail', ['detail' => $detail]);
     }
 
     public function cetakDetail($id){
@@ -85,7 +114,25 @@ class AudiometriController extends Controller
         //dd($audiometri->count());
         $rekap = DB::table('rekomendasis')->join('workspaces', 'workspaces.id', '=', 'rekomendasis.workspace_id')->orderBy('tahun','desc')->paginate(3);
         //dd($rekap);
-        return view('home', [ 'rekap' => $rekap, 'audiometri' => $audiometri->count(), 'rekomendasi' => $rekomendasi->count(), 'januari' => $januari, 'februari' => $februari, 'maret' => $maret, 'april' => $april, 'mei' => $mei, 'juni' => $juni ]);
+        foreach ($rekap as $item) {
+            $item->nama = GoogleTranslateGoogleTranslate::trans($item->nama,app()->getLocale());
+            $item->rekomendasi = GoogleTranslateGoogleTranslate::trans($item->rekomendasi,app()->getLocale());
+        }
+        $locale = app()->getLocale(); // Contoh: 'id', 'en', 'fr'
+
+        // Inisialisasi Google Translate dengan bahasa dinamis
+        $translator = new GoogleTranslateGoogleTranslate($locale);
+        $labels = [
+            'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni'
+        ];
+        $translatedLabels = array_map(fn($label) =>  $translator->translate($label), $labels);
+        $label = $translator->translate('Persentase Tingkat Pendengaran');
+        return view('home', [ 'rekap' => $rekap, 'audiometri' => $audiometri->count(), 'rekomendasi' => $rekomendasi->count(), 'januari' => $januari, 'februari' => $februari, 'maret' => $maret, 'april' => $april, 'mei' => $mei, 'juni' => $juni, 'bulan' => $translatedLabels, 'label' => $label ]);
     }
 
     public function homePegawai($id){

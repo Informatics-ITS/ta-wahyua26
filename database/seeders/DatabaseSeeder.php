@@ -112,11 +112,11 @@ class DatabaseSeeder extends Seeder
             'foto' => 'avatar5.png',
         ]);
 
-        \App\Models\User::factory(300)->create([
+        \App\Models\User::factory(324)->create([
             'jabatan_id' => 8,
         ]);
 
-        \App\Models\User::factory(100)->create([
+        \App\Models\User::factory(125)->create([
             'jabatan_id' => 9,
         ]);
 

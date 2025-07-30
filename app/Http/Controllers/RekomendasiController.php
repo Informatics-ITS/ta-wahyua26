@@ -10,28 +10,46 @@ use App\Models\Workspace;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Phpml\Classification\KNearestNeighbors;
+use App\Http\Controllers\GoogleTranslate;
 use DateTime;
 use DateTimeZone;
+use Stichoza\GoogleTranslate\GoogleTranslate as GoogleTranslateGoogleTranslate;
 
 class RekomendasiController extends Controller
 {
     public function index(){
         $rekomendasi = DB::table('rekomendasis')->join('workspaces', 'workspaces.id', '=', 'rekomendasis.workspace_id')->get();
+        foreach ($rekomendasi as $item) {
+            $item->nama = GoogleTranslateGoogleTranslate::trans($item->nama,app()->getLocale());
+            $item->bulan = GoogleTranslateGoogleTranslate::trans($item->bulan,app()->getLocale());
+            $item->rekomendasi = GoogleTranslateGoogleTranslate::trans($item->rekomendasi,app()->getLocale());
+        }
         return view('rekomendasi.index', ['rekomendasi' => $rekomendasi]);
     }
 
     public function mintaRekomendasi(){
         $ruang = Workspace::get();
+        foreach ($ruang as $item) {
+            $item->nama = GoogleTranslateGoogleTranslate::trans($item->nama,app()->getLocale());
+        }
+        // Mendapatkan bahasa aktif dari aplikasi Laravel
+        $locale = app()->getLocale();
+
+        // Inisialisasi Google Translate
+        $translator = new GoogleTranslateGoogleTranslate();
+        $translator->setSource('id');      // Bahasa sumber (Indonesia)
+        $translator->setTarget($locale);  // Bahasa target sesuai dengan locale aktif
         $bulan = [
             "Januari", "Februari", "Maret", "April", 
             "Mei", "Juni", "Juli", "Agustus", 
             "September", "Oktober", "November", "Desember"
         ];
+        $translatedMonths = array_map(fn($month) => $translator->translate($month), $bulan);
         $tahun = [
             "2024"
         ];
-        //dd($ruang)
-        return view('rekomendasi.form', ['ruang' => $ruang, 'bulan' => $bulan, 'tahun' => $tahun]);
+        //dd($bulan);
+        return view('rekomendasi.form', ['ruang' => $ruang, 'bulan' => $translatedMonths, 'tahun' => $tahun]);
     }
 
     public function detail(Request $request){
@@ -43,7 +61,10 @@ class RekomendasiController extends Controller
         $tahun = $request->tahun;
         $bulan = $request->bulan;
         $namaBulan = date("F", strtotime("2024-$bulan-01"));
-        //$namaBulanTerjemahan = GoogleTranslate::trans($namaBulan, app()->getLocale());
+        // $namaBulanTerjemahan = GoogleTranslate::trans($namaBulan, app()->getLocale());
+        $namaBulanTerjemahan = GoogleTranslateGoogleTranslate::trans($namaBulan,app()->getLocale());
+        $ruangTerjemahan = GoogleTranslateGoogleTranslate::trans($ruang->nama,app()->getLocale());
+        //dd($bulanTerjemahan);
         $tanggal = 31;
         $usia = 0;
         foreach ($tglLahir as $p) {
@@ -57,7 +78,7 @@ class RekomendasiController extends Controller
         $usia = $usia / $tglLahir->count();
         //dd($usia);
         //dd($ruang, $hasil, $usia);
-        return view('rekomendasi.detail', ['ruang' => $ruang, 'hasil' => $hasil, 'usia' => $usia, 'bulan' => $bulan, 'tahun' => $tahun, 'namaBulan' => $namaBulan]);
+        return view('rekomendasi.detail', ['ruang' => $ruang, 'hasil' => $hasil, 'usia' => $usia, 'bulan' => $bulan, 'tahun' => $tahun, 'namaBulan' => $namaBulanTerjemahan, 'namaRuang' => $ruangTerjemahan]);
     }
     
     public function model(Request $request){
@@ -65,6 +86,7 @@ class RekomendasiController extends Controller
         $tahun = $request->tahun;
         $bulan = $request->bulan;
         $namaBulan = date("F", strtotime("2024-$bulan-01"));
+        $namaBulanTerjemahan = GoogleTranslateGoogleTranslate::trans($namaBulan,app()->getLocale());
        
         $request->validate([
             'id' => 'required',
@@ -73,6 +95,7 @@ class RekomendasiController extends Controller
         ]);
 
         $ruang = Workspace::where('workspaces.id', $request->id)->first();
+
         //dd($ruang->nama);
 
         //loading data
@@ -105,7 +128,7 @@ class RekomendasiController extends Controller
 
         Rekomendasi::create([
             'workspace_id' => $ruang->id,
-            'bulan' => $namaBulan,
+            'bulan' => $namaBulanTerjemahan,
             'tahun' => $tahun,
             'tingkatBising' => $ruang->bising,
             'rataHasil' => $request->hasil,
@@ -113,7 +136,9 @@ class RekomendasiController extends Controller
             'rekomendasi' => $rekomendasi,
         ]);
 
-        return redirect()->route('rekomendasi')->with('success', 'Rekomendasi berhasil diminta!');
+        $msg = 'Rekomendasi berhasil diminta!';
+        $transMsg = GoogleTranslateGoogleTranslate::trans($msg,app()->getLocale());
+        return redirect()->route('rekomendasi')->with('success', $transMsg);
     }
 
 }

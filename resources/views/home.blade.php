@@ -188,13 +188,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
   const juni = document.getElementById('juni').value;
   
   const ctx = document.getElementById('chart');
+  var labels = @json($bulan);
+  var label = @json($label);
 
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni'],
+      labels: labels,
       datasets: [{
-        label: 'Persentase Tingkat Pendengaran',
+        label: label,
         data: [januari, februari, maret, april, mei, juni],
         borderWidth: 1
       }]

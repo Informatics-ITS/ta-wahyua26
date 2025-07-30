@@ -109,7 +109,7 @@
     
         <!-- Right -->
         <div>
-          <a href="#!" class="text-white me-4">Sistem Informasi AudioTest Pro</a>
+          <a href="#!" class="text-white me-4">AudioVis Pro</a>
         </div>
         <!-- Right -->
       </div>
