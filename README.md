@@ -25,7 +25,7 @@
 ### Langkah-langkah  
 1. **Clone Repository**  
    ```bash
-   git clone https://github.com/wahyua26/audiovispro.git
+   git clone https://github.com/Informatics-ITS/ta-wahyua26.git
    ```
 2. **Instalasi Dependensi**
    ```bash
