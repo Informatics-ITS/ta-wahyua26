@@ -29,7 +29,7 @@
    ```
 2. **Instalasi Dependensi**
    ```bash
-   cd audiovispro
+   cd ta-wahyua26
    composer install
    ```
 3. **Konfigurasi**
