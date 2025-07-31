@@ -1,75 +1,83 @@
 # 🏁 Tugas Akhir (TA) - Final Project
 
-**Nama Mahasiswa**: [Nama Lengkap]  
-**NRP**: [Nomor Registrasi Pokok]  
-**Judul TA**: [Judul Tugas Akhir]  
-**Dosen Pembimbing**: [Nama Dosen]  
-**Dosen Ko-pembimbing**: [Nama Dosen]
+**Nama Mahasiswa**: [Aji Wahyu Admaja Utama]  
+**NRP**: [05111940000073]  
+**Judul TA**: [Pengembangan Visualisasi Berbasis Website untuk Audiometri menggunakan KNN]  
+**Dosen Pembimbing**: [Fajar Baskoro S.Kom., M.T.]  
+**Dosen Ko-pembimbing**: [Prof. Daniel O. Siahaan., S.Kom., M.Sc., P.D.Eng.]
 
 ---
 
 ## 📺 Demo Aplikasi  
-Embed video demo di bawah ini (ganti `VIDEO_ID` dengan ID video YouTube Anda):  
 
-[![Demo Aplikasi](https://i.ytimg.com/vi/zIfRMTxRaIs/maxresdefault.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)  
+[![Demo Aplikasi](https://i3.ytimg.com/vi/6mfrl0J2aMU/maxresdefault.jpg)](https://youtu.be/6mfrl0J2aMU)  
 *Klik gambar di atas untuk menonton demo*
 
 ---
 
-*Konten selanjutnya hanya merupakan contoh awalan yang baik. Anda dapat berimprovisasi bila diperlukan.*
 
 ## 🛠 Panduan Instalasi & Menjalankan Software  
 
 ### Prasyarat  
-- Daftar dependensi (contoh):
-  - Python 3.10+
-  - Node.js v18+
-  - MySQL 8.0
-  - [Lainnya...]
+- Daftar dependensi:
+  - php 8.1+
 
 ### Langkah-langkah  
 1. **Clone Repository**  
    ```bash
-   git clone https://github.com/Informatics-ITS/TA.git
+   git clone https://github.com/wahyua26/audiovispro.git
    ```
 2. **Instalasi Dependensi**
    ```bash
-   cd [folder-proyek]
-   pip install -r requirements.txt  # Contoh untuk Python
-   npm install  # Contoh untuk Node.js
+   cd audiovispro
+   composer install
    ```
 3. **Konfigurasi**
 - Salin/rename file .env.example menjadi .env
-- Isi variabel lingkungan sesuai kebutuhan (database, API key, dll.)
-4. **Jalankan Aplikasi**
-   ```bash
-   python main.py  # Contoh untuk Python
-   npm start      # Contoh untuk Node.js
+  ```bash
+   cp .env.example .env
    ```
-5. Buka browser dan kunjungi: `http://localhost:3000` (sesuaikan dengan port proyek Anda)
+- Lalu buka file .env dan sesuaikan bagian berikut dengan database lokal, ganti nama_database sesuai nama database MySQL 
+  ```bash
+  DB_CONNECTION=mysql
+  DB_HOST=127.0.0.1
+  DB_PORT=3306
+  DB_DATABASE=nama_database
+  DB_USERNAME=root
+  DB_PASSWORD=
+   ```
+- Generate App Key Laravel
+  ```bash
+  php artisan key:generate
+   ```
+- Migrate & Seed, Pastikan database sudah dibuat di MySQL.
+  ```bash
+  php artisan migrate
+  php artisan db:seed
+   ```
+4. **Jalankan Server Lokal**
+   ```bash
+   php artisan serve
+   ```
+   Akan muncul
+   ```bash
+   Starting Laravel development server: http://127.0.0.1:8000
+   ```
+   Buka di browser: http://127.0.0.1:8000
 
 ---
 
 ## 📚 Dokumentasi Tambahan
 
-- [![Dokumentasi API]](docs/api.md)
 - [![Diagram Arsitektur]](docs/architecture.png)
-- [![Struktur Basis Data]](docs/database_schema.sql)
-
----
-
-## ✅ Validasi
-
-Pastikan proyek memenuhi kriteria berikut sebelum submit:
-- Source code dapat di-build/run tanpa error
-- Video demo jelas menampilkan fitur utama
-- README lengkap dan terupdate
-- Tidak ada data sensitif (password, API key) yang ter-expose
+- [![Struktur Basis Data]](docs/pdm.png)
+- [![Data Hasil Audiometri]](docs/data.sql)
+- [![Dataset Rekomendasi]](docs/dataset.csv)
 
 ---
 
 ## ⁉️ Pertanyaan?
 
 Hubungi:
-- Penulis: [email@mahasiswa]
-- Pembimbing Utama: [email@pembimbing]
+- Penulis: [05111940000073@student.its.ac.id]
+- Pembimbing Utama: [fajar@if.its.ac.id]
